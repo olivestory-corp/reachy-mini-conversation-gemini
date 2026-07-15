@@ -1,0 +1,7 @@
+# Windows batch files MUST keep CRLF line endings (cmd.exe requirement).
+# -text = store bytes as-is, never normalize.
+*.bat -text
+
+# Unix shell scripts must keep LF.
+*.command -text
+*.sh -text

@@ -1,29 +1,30 @@
 @echo off
-chcp 65001 >nul
 setlocal enabledelayedexpansion
 cd /d "%~dp0.."
 set "ROOT=%CD%"
 
-REM ═══════════════════════════════════════════════════════════
-REM  Reachy Mini 대화앱 v0.8.0 (Gemini Live) - 시작 (Windows)
-REM  Reachy Mini Control 앱 없이 CLI 데몬으로 직접 실행합니다.
-REM  * Control 앱이 켜져 있으면 먼저 완전히 종료하세요 (:8000 충돌).
-REM  * 이 폴더 경로에 한글/공백이 없는 곳에 두는 것을 권장합니다.
-REM ═══════════════════════════════════════════════════════════
+REM ===========================================================
+REM  Reachy Mini Conversation App v0.8.0 (Gemini Live) - START
+REM  Runs WITHOUT the Reachy Mini Control app (uses CLI daemon).
+REM  * Quit the Control app completely before running (port 8000).
+REM  * Connect the robot via USB.
+REM  NOTE: This file must stay ASCII-only. Korean text breaks
+REM        cmd.exe batch parsing on Windows (codepage mismatch).
+REM ===========================================================
 
-REM ══ 설정: 로봇 없이 테스트=1, 실제 로봇(USB)=0 ══
+REM == SIM=0 : real robot (USB)   /   SIM=1 : no robot, MuJoCo sim (experimental) ==
 set "SIM=0"
 
-echo ──────────────────────────────────────────
-echo   Reachy Mini 대화앱 (Gemini) 시작
-echo ──────────────────────────────────────────
+echo ------------------------------------------
+echo   Reachy Mini Conversation App (Gemini)
+echo ------------------------------------------
 
 if exist ".venv\Scripts\activate.bat" goto venv_ready
 
-echo [설치] 첫 실행 - 가상환경 생성 + 패키지 설치 중... (몇 분 걸립니다)
+echo [SETUP] First run - creating venv and installing packages...
+echo         This takes a few minutes. Internet required. Please wait.
 where uv >nul 2>&1
 if !errorlevel! equ 0 (
-  REM uv.lock 의 검증 버전 그대로 설치 (reachy-mini 1.8.3 등 = v0.8.0 출시 조합)
   uv sync --frozen
   if !errorlevel! neq 0 goto fail_install
   call ".venv\Scripts\activate.bat"
@@ -44,26 +45,25 @@ call ".venv\Scripts\activate.bat"
 goto after_venv
 
 :venv_done
-echo [설치] 완료.
+echo [SETUP] Done.
 
 :after_venv
 
-REM ── 로봇 데몬 ──
 set "DAEMON_ARGS=--preload-datasets"
 if "%SIM%"=="1" (
-  REM 로봇 없는 테스트(실험적) - MuJoCo 시뮬. 없으면 자동 설치.
   python -c "import mujoco" 2>nul || python -m pip install mujoco >nul 2>&1
-  set "DAEMON_ARGS=--sim --preload-datasets"
+  set "DAEMON_ARGS=--sim --headless --preload-datasets"
 )
 
 curl -s -m 2 http://127.0.0.1:8000/api/daemon/status >nul 2>&1
 if !errorlevel! equ 0 (
-  echo [1/2] 로봇 데몬 이미 실행 중 :8000
+  echo [1/2] Robot daemon already running on port 8000.
   goto run_app
 )
 
-echo [1/2] 로봇 데몬 기동 중... (SIM=%SIM%)  ^<- 새 창이 뜹니다. 그 창은 닫지 마세요.
-start "Reachy 데몬 (닫지 마세요)" cmd /k ""%ROOT%\.venv\Scripts\reachy-mini-daemon.exe" %DAEMON_ARGS%"
+echo [1/2] Starting robot daemon (SIM=%SIM%) ... a new window will open.
+echo       Do NOT close that daemon window.
+start "Reachy Daemon - do not close" cmd /k ""%ROOT%\.venv\Scripts\reachy-mini-daemon.exe" %DAEMON_ARGS%"
 
 set /a n=0
 :wait
@@ -73,35 +73,39 @@ if !errorlevel! equ 0 goto daemon_ok
 set /a n+=1
 if !n! lss 30 goto wait
 echo.
-echo ❌ 데몬 시작 실패 - 로봇 USB 연결을 확인하세요.
-echo    로봇 없이 테스트하려면 이 파일을 편집기로 열어 SIM=0 을 SIM=1 로 바꾸세요.
+echo [ERROR] Daemon did not start.
+echo         1) Is the robot connected via USB and powered on?
+echo         2) Is the Reachy Mini Control app fully quit?
+echo         (No robot? Open this file and set SIM=1 to try MuJoCo sim.)
 pause
 exit /b 1
 :daemon_ok
-echo       데몬 running
+echo       Daemon is running.
 
 :run_app
-echo [2/2] 대화앱 시작 - 로봇에게 말을 걸어보세요.
-echo       끝내려면: 이 창을 닫거나 WIN_종료.bat 실행
-echo ──────────────────────────────────────────
+echo [2/2] Starting conversation app - talk to the robot!
+echo       To stop: close this window, or run the WIN stop file
+echo       (the other WIN_*.bat in this 0.* folder).
+echo ------------------------------------------
 "%ROOT%\.venv\Scripts\reachy-mini-conversation-app.exe"
 goto end
 
 :fail_python
 echo.
-echo ❌ Python 3.12 이 필요합니다.
-echo    https://www.python.org/downloads/ 에서 3.12 설치 시 "Add python.exe to PATH" 체크 후 다시 실행하세요.
+echo [ERROR] Python 3.12 is required.
+echo         Install from https://www.python.org/downloads/
+echo         and check "Add python.exe to PATH" during setup.
 pause
 exit /b 1
 
 :fail_install
 echo.
-echo ❌ 설치 실패. 인터넷 연결과 Python 3.12 를 확인하고,
-echo    이 폴더의 .venv 폴더를 삭제한 뒤 다시 실행하세요.
+echo [ERROR] Install failed. Check your internet and Python 3.12,
+echo         then delete the .venv folder and run this file again.
 pause
 exit /b 1
 
 :end
 echo.
-echo (앱이 종료되었습니다. 데몬 창은 WIN_종료.bat 로 정리하세요.)
+echo (App exited. Use the stop file to close the daemon window.)
 pause
