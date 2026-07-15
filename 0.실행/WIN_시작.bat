@@ -25,7 +25,10 @@ echo [SETUP] First run - creating venv and installing packages...
 echo         This takes a few minutes. Internet required. Please wait.
 where uv >nul 2>&1
 if !errorlevel! equ 0 (
-  uv sync --frozen
+  REM Pin Python 3.12 - the version v0.8.0 was tested/locked with.
+  REM 3.13/3.14 may fail (locked deps have no wheels for them).
+  REM If 3.12 is missing, uv downloads it automatically.
+  uv sync --python 3.12 --frozen
   if !errorlevel! neq 0 goto fail_install
   call ".venv\Scripts\activate.bat"
   goto venv_done

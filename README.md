@@ -25,7 +25,11 @@ Reachy Mini Control 앱 없이 **더블클릭 한 번으로** 실행됩니다.
 
 ### 2) 준비물 (처음 한 번만)
 - **Python 3.12** 설치 → https://www.python.org/downloads/
-  (Windows 는 설치 화면에서 **"Add python.exe to PATH"** 체크 필수!)
+  > ⚠️ **반드시 3.12 를 받으세요.** 그 페이지의 큰 버튼은 최신(3.14 등)이라 **쓰면 안 됩니다.**
+  > 페이지를 내려 **"Looking for a specific release?"** 에서 **Python 3.12.x** 를 선택해 설치하세요.
+  > (이 앱은 3.12 에서 검증됐고, 3.13/3.14 는 부품(패키지)이 아직 없어 설치가 실패합니다.)
+  - Windows 는 설치 화면에서 **"Add python.exe to PATH"** 체크 필수!
+  - 이미 `uv` 가 깔려 있다면 Python 을 따로 안 깔아도 됩니다(3.12 를 알아서 받아 씁니다).
 - Reachy Mini **로봇을 USB 로 연결**.
 - 로봇 **Control 앱이 켜져 있으면 완전히 종료**하세요 (안 끄면 충돌합니다).
 
