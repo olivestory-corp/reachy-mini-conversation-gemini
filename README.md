@@ -34,10 +34,26 @@ Reachy Mini Control 앱 없이 **더블클릭 한 번으로** 실행됩니다.
 - 로봇 **Control 앱이 켜져 있으면 완전히 종료**하세요 (안 끄면 충돌합니다).
 
 ### 3) API 키 넣기 (처음 한 번만)
-- [Google AI Studio](https://aistudio.google.com/apikey) 에서 키를 발급받습니다.
-- 압축 푼 폴더 안 **`.env.example`** 을 복사해 이름을 **`.env`** 로 바꾸고,
-  파일을 열어 `GEMINI_API_KEY=` 뒤에 키를 붙여넣고 저장합니다.
-  > ⚠️ `.env` 에는 키가 들어있어 이 저장소에는 올라가지 않습니다. **각자 넣어야** 합니다.
+[Google AI Studio](https://aistudio.google.com/apikey) 에서 키를 발급받습니다.
+
+> 🍎 **Mac은 `.env.example` 이 "숨김파일"이라 압축을 풀어도 안 보입니다!** (없는 게 아닙니다)
+> Finder에서 그 폴더를 열고 **`⌘(Command)` + `Shift` + `.`(마침표)** 를 누르면 숨김파일이 나타납니다.
+> (다시 누르면 도로 숨겨집니다.)
+>
+> 🪟 **Windows** 는 그냥 보입니다. 혹시 안 보이면 탐색기 **보기 → 표시 → 숨긴 항목** 체크.
+
+1. **`.env.example`** 을 **복사**합니다. (Mac `⌘C`→`⌘V` / Windows `Ctrl+C`→`Ctrl+V`)
+2. 복사본 이름을 **`.env`** 로 바꿉니다. (확장자·앞의 점 포함, 이름은 딱 `.env`)
+3. `.env` 를 텍스트 편집기로 열어 **`GEMINI_API_KEY=`** 뒤에 발급받은 키를 붙여넣고 **저장**합니다.
+
+> 💡 Mac에서 Finder가 `.env` 로 이름 바꾸기를 막으면, **터미널**에 아래 3줄이면 끝입니다:
+> ```bash
+> cd ~/Desktop/reachy-mini-conversation-gemini-main
+> cp .env.example .env
+> open -e .env          # 열리면 키 넣고 저장(⌘S)
+> ```
+>
+> ⚠️ `.env` 에는 키가 평문으로 들어갑니다. **공유·업로드 금지** (저장소에도 안 올라갑니다).
 
 ### 4) 실행하기
 - **Mac** : 폴더 안 **`0.실행`** → **`OSX_시작.command`** 더블클릭.
